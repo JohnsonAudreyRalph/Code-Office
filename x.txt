@@ -1,0 +1,13 @@
+Thay vì cho phép người dùng chọn một tệp tin và sao chép nội dung của nó vào một tài liệu Word mới thì hãy thực hiện yêu cầu sau
+- Thực hiện sao chép ngẫu nhiên 1 câu trong mỗi nhóm và đưa vào một tài liệu word mới.
+- Khi thực hiện sao chép thì chỉ sao chép nội dung bên trong dấu <cau> </Cau>.
+Biết rằng:
+- Mỗi nhóm câu đều được đánh dấu mở đầu và kết thúc như sau: <Nhom> </Nhom>
+- Mỗi câu đề được đánh dấu mở đầu và kết thúc như sau: <cau> </Cau>
+Ví dụ:
+<Nhom><Cau>Đây là nội dung của câu 1 nhóm 1</Cau><Cau>Đây là nội dung của câu 2 nhóm 1</Cau><Cau>Đây là nội dung của câu 3 nhóm 1</Cau></Nhom><Nhom><Cau>Đây là nội dung của câu 4 nhóm 2</Cau><Cau>Đây là nội dung của câu 5 nhóm 2</Cau></Nhom><Nhom><Cau>Đây là nội dung của câu 8 nhóm 3</Cau></Nhom>
+
+Kết quả lấy được phải là:
+Đây là nội dung của câu 3 nhóm 1
+Đây là nội dung của câu 4 nhóm 2
+Đây là nội dung của câu 8 nhóm 3

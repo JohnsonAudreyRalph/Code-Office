@@ -1,0 +1,61 @@
+Private Sub Save_File_Click()
+    MsgBox "Nút này dùng d? luu file"
+End Sub
+
+Private Sub Select_File_Click()
+    Dim fileDialog As fileDialog
+    Set fileDialog = Application.fileDialog(msoFileDialogFilePicker)
+    Dim selectedFile As String
+    If fileDialog.Show = -1 Then
+        selectedFile = fileDialog.SelectedItems(1)
+        ProcessAndDisplayRandomQuestions selectedFile
+    End If
+End Sub
+
+Sub ProcessAndDisplayRandomQuestions(selectedFile As String)
+    Dim fileContent As String
+    Dim newDoc As Document
+    Dim groupStart As Long
+    Dim groupEnd As Long
+    Dim questionStart As Long
+    Dim questionEnd As Long
+    Dim groupContent As String
+    Dim questionContent As String
+    
+    ' M? t?p dã ch?n và d?c n?i dung
+    Documents.Open selectedFile
+    fileContent = ActiveDocument.Content.Text
+    ActiveDocument.Close
+    
+    ' T?o tài li?u m?i
+    Set newDoc = Documents.Add
+    
+    ' X? lý và hi?n th? câu h?i ng?u nhiên t? m?i nhóm
+    groupStart = InStr(1, fileContent, "<Nhom>")
+    While groupStart > 0
+        groupEnd = InStr(groupStart, fileContent, "</Nhom>")
+        If groupEnd > 0 Then
+            groupContent = Mid(fileContent, groupStart, groupEnd - groupStart + Len("</Nhom>"))
+            
+            ' Tìm và hi?n th? câu h?i ng?u nhiên t? nhóm
+            questionStart = InStr(1, groupContent, "<Cau>")
+            If questionStart > 0 Then
+                questionEnd = InStr(questionStart, groupContent, "</Cau>")
+                If questionEnd > 0 Then
+                    questionContent = Mid(groupContent, questionStart, questionEnd - questionStart + Len("</Cau>"))
+                    
+                    ' Chèn câu h?i vào tài li?u m?i
+                    newDoc.Content.InsertAfter "Câu h?i ng?u nhiên trong nhóm:" & vbCrLf
+                    newDoc.Content.InsertAfter questionContent & vbCrLf
+                End If
+            End If
+        End If
+        ' Tìm nhóm k? ti?p
+        groupStart = InStr(groupEnd, fileContent, "<Nhom>")
+    Wend
+    
+    ' Hi?n th? tài li?u m?i lên màn hình
+    newDoc.Activate
+End Sub
+
+

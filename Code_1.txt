@@ -1,0 +1,35 @@
+==> Lưu ý:
+1) Phải thực hiện tạo 2 nút bấm và đặt tên 2 nút bấm là "Save_File" và Select_File"
+2) Thực hiện tạo thêm một TextBox (Trong ActiveX Control) và đặt tên là TextBox1
+3) Xét các thuộc tính cho TextBox1 như:
+ + MultiLine: Đặt giá trị này là True. Điều này cho phép TextBox hiển thị nhiều dòng văn bản.
+ + EnterKeyBehavior: Đặt giá trị này là False. Điều này ngăn TextBox tự động xuống dòng khi bạn nhấn phím Enter.
+ + Locked: Đặt giá trị này là True. Điều này ngăn người dùng chỉnh sửa nội dung của TextBox.
+ + ScrollBars: Đặt giá trị này là 2 - fmScrollBarsVertical để hiển thị thanh cuộn dọc khi cần thiết.
+Private Sub Save_File_Click()
+    MsgBox "Nút này dùng d? luu file"
+End Sub
+
+Private Sub Select_File_Click()
+    Dim fileDialog As fileDialog
+    Set fileDialog = Application.fileDialog(msoFileDialogFilePicker)
+    OpenFile fileDialog
+End Sub
+
+Sub OpenFile(fileDialog As fileDialog)
+    With fileDialog
+        .Title = "Ch?n m?t tài li?u Word"
+        .Filters.Clear
+        .Filters.Add "Tài li?u Word", "*.docx;*.doc"
+        .AllowMultiSelect = False
+        
+        If .Show = -1 Then
+            Dim selectedFile As String
+            selectedFile = .SelectedItems(1)
+            Documents.Open selectedFile
+            ThisDocument.TextBox1.Value = ActiveDocument.Content.Text
+            ActiveDocument.Close
+        End If
+    End With
+End Sub
+

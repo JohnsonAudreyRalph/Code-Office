@@ -1,0 +1,92 @@
+Private Sub Save_File_Click()
+    MsgBox "Nút này dùng d? luu file"
+End Sub
+
+Private Sub Select_File_Click()
+    Dim fileDialog As fileDialog
+    Set fileDialog = Application.fileDialog(msoFileDialogFilePicker)
+    Dim selectedFile As String
+    If fileDialog.Show = -1 Then
+        selectedFile = fileDialog.SelectedItems(1)
+        CreateNewDocumentAndCopyData selectedFile
+    End If
+End Sub
+
+Sub CreateNewDocumentAndCopyData(selectedFile As String)
+    Dim newDoc As Document
+    Set newDoc = Documents.Add
+    Documents.Open selectedFile
+    Selection.WholeStory
+    Selection.Copy
+    newDoc.Activate
+    Selection.Paste
+    ' Th?c hi?n x? lý tài li?u m?i
+    ProcessSelectedFile selectedFile
+    ' Ð?nh d?ng font ch? trong tài li?u m?i
+    With newDoc.Content.Font
+        .Name = "Times New Roman" ' Tên font chu
+        .Size = 14 ' Kích thuoc phon chu
+        .Bold = False ' Chu dam (True/False)
+        .Italic = False ' Chu nghiêng (True/False)
+        .Underline = wdUnderlineNone ' Gach chân (wdUnderlineNone: không có g?ch chân)
+        .Color = wdColorBlack ' Màu chu (wdColorBlack: màu den)
+    End With
+    newDoc.Activate
+    Documents(selectedFile).Close ' Ðóng tài li?u ban d?u
+End Sub
+
+Sub ProcessSelectedFile(selectedFile As String)
+    ' M? t?p và ki?m tra n?u nó t?n t?i
+    If Dir(selectedFile) <> "" Then
+        Dim fileContent As String
+        Open selectedFile For Input As #1
+        Do While Not EOF(1) ' Ki?m tra n?u v?n còn d? li?u d? d?c
+            Line Input #1, lineData ' Ð?c t?ng dòng d? li?u
+            fileContent = fileContent & lineData & vbCrLf ' N?i các dòng l?i v?i nhau
+        Loop
+        Close #1
+
+        ' Tách n?i dung thành các nhóm câu h?i và x? lý nó
+        Dim groupStart As Long
+        Dim groupEnd As Long
+        groupStart = InStr(1, fileContent, "<Nhom>")
+        While groupStart > 0
+            groupEnd = InStr(groupStart, fileContent, "</Nhom>")
+            If groupEnd > 0 Then
+                Dim groupContent As String
+                groupContent = Mid(fileContent, groupStart, groupEnd - groupStart + Len("</Nhom>"))
+                
+                ' Trích xu?t và hi?n th? câu h?i ng?u nhiên trong nhóm
+                DisplayRandomQuestionInGroup groupContent
+
+                ' Tìm nhóm k? ti?p
+                groupStart = InStr(groupEnd, fileContent, "<Nhom>")
+            Else
+                ' Không tìm th?y k?t thúc c?a nhóm, thoát kh?i vòng l?p
+                MsgBox "Error"
+                Exit Sub
+            End If
+        Wend
+    Else
+        MsgBox "File not exit: " & selectedFile
+    End If
+End Sub
+
+
+Sub DisplayRandomQuestionInGroup(groupContent As String)
+    Dim questionStart As Long
+    Dim questionEnd As Long
+    questionStart = InStr(1, groupContent, "<Cau>")
+    If questionStart > 0 Then
+        questionEnd = InStr(questionStart, groupContent, "</Cau>")
+        If questionEnd > 0 Then
+            ' Trích xu?t và hi?n th? câu h?i ng?u nhiên trong nhóm
+            Dim questionContent As String
+            questionContent = Mid(groupContent, questionStart, questionEnd - questionStart + Len("</Cau>"))
+
+            ' Chèn câu h?i vào tài li?u m?i
+            newDoc.Content.InsertAfter "Câu h?i ng?u nhiên trong nhóm:" & vbCrLf
+            newDoc.Content.InsertAfter questionContent & vbCrLf
+        End If
+    End If
+End Sub
